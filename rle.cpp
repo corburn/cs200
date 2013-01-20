@@ -8,15 +8,14 @@ int main( int num_args, char* arg_values[] )
 {
 	if (num_args != 2) {
 		printf( "Usage: rle filename (produces filename.rle)\n" );
-		printf( "
-		        rle filename.rle (produces filename.plain)\n" );
+		printf( "       rle filename.rle (produces filename.plain)\n" );
 		exit(1);
 	}
 	char* input_filename = arg_values[1];
-// read the file data into an array
+	// read the file data into an array
 	int count;
 	char* data = readFileData(input_filename,&count);
-// Call compress() or decompress().
+	// Call compress() or decompress().
 	FILE* outfile;
 	int len = strlen(input_filename);
 	if (len < 4 || strcmp(input_filename+(len-4),".rle") != 0) {
@@ -35,42 +34,52 @@ int main( int num_args, char* arg_values[] )
 		outfile = fopen( output_filename, "wb" );
 		decompress( data, count, outfile );
 	}
-// Close the output file to ensure data is saved.
+	// Close the output file to ensure data is saved.
 	fclose(outfile);
-// Free the array we allocated
+	// Free the array we allocated
 	delete data;
 	return 0;
 }
 void compress( char* data, int count, FILE* outfile )
 {
-// TODO: compress the data instead of just writing it out to the file
-	for (int i=0; i<count; ++i) {
-		putc( data[i], outfile ); // write out a single byte of data
+	int i = 0;
+	int iter = 0;
+	// loop through the data
+	while(iter < count) {
+		// count the consecutive chars
+		do {
+			iter++;
+		} while(iter < count && data[i] == data[iter]);
+		// write the count and char to file
+		putc(iter - i, outfile);
+		putc(data[i], outfile);
+		// advance the index
+		i = iter;
 	}
 }
 void decompress( char* data, int count, FILE* outfile )
 {
-// TODO: decompress the data instead of just writing it out to the file
+	// TODO: decompress the data instead of just writing it out to the file
 	for (int i=0; i<count; ++i) {
 		putc( data[i], outfile ); // write out a single byte of data
 	}
 }
 char* readFileData( char* filename, int* count_ptr )
 {
-// Returns a pointer to an array storing the file data.
-// Sets the variable pointed to by 'count' to contain the file size.
-// Exits the program if the filename doesn't exist.
+	// Returns a pointer to an array storing the file data.
+	// Sets the variable pointed to by 'count' to contain the file size.
+	// Exits the program if the filename doesn't exist.
 	FILE* infile = fopen(filename,"rb");
 	if ( !infile ) {
 		printf( "No such file \"%s\"!\n", filename );
 		exit(1);
 	}
-// Get file size by going to the end of the file, getting the
-// position, and then going back to the start of the file.
+	// Get file size by going to the end of the file, getting the
+	// position, and then going back to the start of the file.
 	fseek( infile, 0, SEEK_END );
 	int count = ftell(infile);
 	fseek( infile, 0, SEEK_SET );
-// read the data from the file
+	// read the data from the file
 	char* data = new char[count];
 	fread( data, 1, count, infile );
 	fclose(infile);
