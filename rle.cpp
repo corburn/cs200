@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-void compress( char* data, int count, FILE* outfile );
-void decompress( char* data, int count, FILE* outfile );
-char* readFileData( char* filename, int* count_ptr );
+void compress( char* data, int size, FILE* outfile );
+void decompress( char* data, int size, FILE* outfile );
+char* readFileData( char* filename, int* size_ptr );
 int main( int num_args, char* arg_values[] )
 {
 	if (num_args != 2) {
@@ -13,8 +13,8 @@ int main( int num_args, char* arg_values[] )
 	}
 	char* input_filename = arg_values[1];
 	// read the file data into an array
-	int count;
-	char* data = readFileData(input_filename,&count);
+	int size;
+	char* data = readFileData(input_filename,&size);
 	// Call compress() or decompress().
 	FILE* outfile;
 	int len = strlen(input_filename);
@@ -24,7 +24,7 @@ int main( int num_args, char* arg_values[] )
 		strcat( output_filename, ".rle" );
 		printf( "Compressing %s to %s\n", input_filename, output_filename );
 		outfile = fopen( output_filename, "wb" );
-		compress( data, count, outfile );
+		compress( data, size, outfile );
 	} else {
 		char output_filename[80];
 		strncpy( output_filename, input_filename, len-4 );
@@ -32,7 +32,7 @@ int main( int num_args, char* arg_values[] )
 		strcat( output_filename, ".plain" );
 		printf( "Decompressing %s to %s\n", input_filename, output_filename );
 		outfile = fopen( output_filename, "wb" );
-		decompress( data, count, outfile );
+		decompress( data, size, outfile );
 	}
 	// Close the output file to ensure data is saved.
 	fclose(outfile);
@@ -40,16 +40,16 @@ int main( int num_args, char* arg_values[] )
 	delete data;
 	return 0;
 }
-void compress( char* data, int count, FILE* outfile )
+void compress( char* data, int size, FILE* outfile )
 {
 	int i = 0;
 	int iter = 0;
 	// loop through the data
-	while(iter < count) {
+	while(iter < size) {
 		// count the consecutive chars
 		do {
 			iter++;
-		} while(iter < count && data[i] == data[iter]);
+		} while(iter < size && data[i] == data[iter]);
 		// write the count and char to file
 		putc((char)(iter - i), outfile);
 		putc(data[i], outfile);
@@ -57,17 +57,17 @@ void compress( char* data, int count, FILE* outfile )
 		i = iter;
 	}
 }
-void decompress( char* data, int count, FILE* outfile )
+void decompress( char* data, int size, FILE* outfile )
 {
 	// TODO: decompress the data instead of just writing it out to the file
-	for (int i=0; i<count; ++i) {
+	for (int i=0; i<size; ++i) {
 		putc( data[i], outfile ); // write out a single byte of data
 	}
 }
-char* readFileData( char* filename, int* count_ptr )
+char* readFileData( char* filename, int* size_ptr )
 {
 	// Returns a pointer to an array storing the file data.
-	// Sets the variable pointed to by 'count' to contain the file size.
+	// Sets the variable pointed to by 'size' to contain the file size.
 	// Exits the program if the filename doesn't exist.
 	FILE* infile = fopen(filename,"rb");
 	if ( !infile ) {
@@ -77,13 +77,13 @@ char* readFileData( char* filename, int* count_ptr )
 	// Get file size by going to the end of the file, getting the
 	// position, and then going back to the start of the file.
 	fseek( infile, 0, SEEK_END );
-	int count = ftell(infile);
+	int size = ftell(infile);
 	fseek( infile, 0, SEEK_SET );
 	// read the data from the file
-	char* data = new char[count];
-	fread( data, 1, count, infile );
+	char* data = new char[size];
+	fread( data, 1, size, infile );
 	fclose(infile);
-	*count_ptr = count;
+	*size_ptr = size;
 	return data;
 }
 
