@@ -42,10 +42,9 @@ int main( int num_args, char* arg_values[] )
 }
 void compress( char* data, int size, FILE* outfile )
 {
-	int i = 0;
 	int iter = 0;
 	// loop through the data
-	while(iter < size) {
+	for(int i = 0; iter < size; i = iter) {
 		// count the consecutive chars
 		do {
 			iter++;
@@ -53,8 +52,6 @@ void compress( char* data, int size, FILE* outfile )
 		// write the count and char to file
 		putc((char)(iter - i), outfile);
 		putc(data[i], outfile);
-		// advance the index
-		i = iter;
 	}
 }
 // decompress writes the decompressed data to outfile
