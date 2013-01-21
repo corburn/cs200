@@ -51,7 +51,7 @@ void compress( char* data, int count, FILE* outfile )
 			iter++;
 		} while(iter < count && data[i] == data[iter]);
 		// write the count and char to file
-		putc(iter - i, outfile);
+		putc((char)(iter - i), outfile);
 		putc(data[i], outfile);
 		// advance the index
 		i = iter;
