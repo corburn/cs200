@@ -57,11 +57,13 @@ void compress( char* data, int size, FILE* outfile )
 		i = iter;
 	}
 }
+// decompress writes the decompressed data to outfile
 void decompress( char* data, int size, FILE* outfile )
 {
-	// TODO: decompress the data instead of just writing it out to the file
-	for (int i=0; i<size; ++i) {
-		putc( data[i], outfile ); // write out a single byte of data
+	for (int i=0; i<size; i+=2) {
+			for(char count=0; count < data[i]; ++count) {
+					putc(data[i+1], outfile);
+			}
 	}
 }
 char* readFileData( char* filename, int* size_ptr )
