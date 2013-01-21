@@ -38,14 +38,6 @@ void printAnalysis(int bits) {
 	int sign = (bits >> 31) & 1;
 	int exp = (bits >> 23) & 255;
 
-	// interpret sign as either 'positive' or 'negative'
-	char  *s;
-	if(sign == 0) {
-		s = "(positive)";
-	} else {
-		s = "(negative)";
-	}
-
 	printf("Float Analysis\n");
 	
 	printf("  Bit Pattern:\t%d ", sign);
@@ -53,6 +45,13 @@ void printAnalysis(int bits) {
 	mantissa(bits); printf("\n");
 	printf("\t\tS Exponent Significand/Mantissa\n\n");
 
+	// interpret sign as either 'positive' or 'negative'
+	char  *s;
+	if(sign == 0) {
+		s = "(positive)";
+	} else {
+		s = "(negative)";
+	}
 	printf("  Sign:\t\t%d %s\n", sign, s);
 
 	printf("  Exponent:\t");
