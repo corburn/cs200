@@ -17,8 +17,12 @@
 // CBA-FED-IHG-LKJ-ONM-RQP-UTS-XWV-
 //=============================================================================
 #include <iostream>
+#include <cstring>
 using namespace std;
 void encode( char* src, char* dest );
+
+const char base64[65] = {"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"};
+
 int main()
 {
 	// Declare arrays to store original and encoded strings.
@@ -51,8 +55,8 @@ void encode( char* src, char* dest )
 	int ch0 = src[0];
 	int ch1 = src[1];
 	int ch2 = src[2];
-	dest[0]
-	dest[1]
-	dest[2]
-	dest[3]
+	dest[0] = base64[(ch0 >> 2) & 63];
+	dest[1] = base64[((ch0 << 4) & 48) | ((ch1 >> 4) & 15)];
+	dest[2] = base64[((ch1 & 15) << 2) | ((ch2 >> 6) & 3)];
+	dest[3] = base64[ch2 & 63];
 }
