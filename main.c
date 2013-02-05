@@ -107,10 +107,9 @@ void fractions(int bits)
 }
 
 /*
- * binary prints the binary representation of a range of bits.
+ * binary writes the binary representation of a range of bits to dst.
  * bits is the source from which the range of bits will be taken.
- * high is the index of the highest order bit in the range.
- * len is the length of the range.
+ * len is the length of the range. sizeof() cannot be used on a parameter.
  */
 char* binary(char *dst, int bits, int len)
 {
