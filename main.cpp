@@ -67,6 +67,7 @@ void printUsage() {
 	exit(1);
 }
 
+// encode returns a string encoded in base64.
 string encode(string in)
 {
 	string out;
@@ -112,5 +113,6 @@ string encode(string in)
 	return out;
 }
 
+// decode returns a decoded base64 string.
 string decode(string in) {
 }
