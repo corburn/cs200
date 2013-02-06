@@ -2,61 +2,115 @@
 // Base64 Encoding Starter Framework
 // 2011.02.16 by Abe Pralle
 //
-// Reads a string of text and prints a resulting string of text where every
-// 3 original characters have been transformed into 4 result characters
-// consisting of the first three characters reversed followed by a hypen.
+// CS200
+// Project 5: Base64
+// 2013.02.05 Jason Travis
+//
+// Reads in a string and prints it as encoded/decoded base64 depending on the
+// command line argument.
+//
+// Usage:
+//
+// base64 [encode|decode]
 //
 // Example output:
 //
 // Enter text:
 // ABCDEFGHIJKLMNOPQRSTUVWXYZ
 //
-// You typed in "ABCDEFGHIJKLMNOPQRSTUVWXYZ" (26 characters)
+// encoding...
 //
-// Encoded value:
 // CBA-FED-IHG-LKJ-ONM-RQP-UTS-XWV-
 //=============================================================================
 #include <iostream>
+#include <cstdlib>
 #include <cstring>
 using namespace std;
-void encode( char* src, char* dest );
+
+void printUsage();
+string encode( string in );
+string decode( string in );
 
 const char base64[65] = {"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"};
 
-int main()
+int main(int argc, char* argv[])
 {
-	// Declare arrays to store original and encoded strings.
-	char st[80];
-	char encoded[120];
+	if(argc != 2) {
+		printUsage();
+	}
+
+	string input, output;
+
 	// Read in original string.
 	cout << "Enter text: ";
-	cin.getline( st, 80 );
-	// Print back out along with the # of characters.
-	int len = strlen(st);
-	cout << "You typed in \"" << st << "\" (" << len << " characters)" << endl;
-	// Round length down to a multiple of 3.
-	len -= (len % 3);
-	// Encode the string - every 3 characters of original becomes
-	// 4 characters of result.
-	int dest_index = 0;
-	for (int i=0; i<len; i+=3) {
-		encode( st+i, encoded+dest_index );
-		dest_index += 4;
+	getline(cin, input);
+
+	// Parse command line argument
+	if(strcmp(argv[1], "encode") == 0) {
+		cout << "\nencoding...\n\n";
+		output = encode(input);
+	} else if((argv[1], "decode") == 0) {
+		cout << "\ndecoding...\n\n";
+		decode(input);
+	} else {
+		printUsage();
 	}
-	// Null terminate destination string.
-	encoded[dest_index] = 0;
-	// Print encoded value.
-	cout << "Encoded value: ";
-	cout << encoded << endl;
+
+	// Print result
+	cout << output << endl;
+
 	return 0;
 }
-void encode( char* src, char* dest )
+
+void printUsage() {
+	cout << "Usage: base64 [encode|decode]" << endl;
+	exit(1);
+}
+
+string encode(string in)
 {
-	int ch0 = src[0];
-	int ch1 = src[1];
-	int ch2 = src[2];
-	dest[0] = base64[(ch0 >> 2) & 63];
-	dest[1] = base64[((ch0 << 4) & 48) | ((ch1 >> 4) & 15)];
-	dest[2] = base64[((ch1 & 15) << 2) | ((ch2 >> 6) & 3)];
-	dest[3] = base64[ch2 & 63];
+	string out;
+	// Round length down to a multiple of 3. It is easier to encode in multiples of three
+	// and use a switch statement to catch the edge cases.
+	int len = in.length();
+	len -= (len % 3);
+	// The set of character currently being encoded
+	int ch0, ch1, ch2;
+
+	// Use bitwise operators and the base64[] table to encode src.
+	// 00000011 11112222 22333333
+	// 000000 111111 222222 333333
+	// A      B      C      D
+	for(int i = 0; i < len; i+=3) {
+		ch0 = in[i];
+		ch1 = in[i+1];
+		ch2 = in[i+2];
+		out.push_back(base64[((ch0 >> 2) & 63)]);
+		out.push_back(base64[((ch0 << 4) & 48) | ((ch1 >> 4) & 15)]);
+		out.push_back(base64[((ch1 << 2) & 60) | ((ch2 >> 6) & 3)]);
+		out.push_back(base64[ch2 & 63]);
+	}
+
+	// Encode the remaining characters and pad with '='
+	switch(in.length()%3) {
+		default:
+			break;
+		case 1:
+			ch0 = in[len];
+			out.push_back(base64[((ch0 >> 2) & 63)]);
+			out.push_back(base64[((ch0 << 4) & 48)]);
+			out.append(2, '=');
+			break;
+		case 2:
+			ch0 = in[len];
+			ch1 = in[len+1];
+			out.push_back(base64[((ch0 >> 2) & 63)]);
+			out.push_back(base64[((ch0 << 4) & 48) | ((ch1 >> 4) & 15)]);
+			out.push_back(base64[((ch1 << 2) & 60)]);
+			out.append(1, '=');
+	}
+	return out;
+}
+
+string decode(string in) {
 }
