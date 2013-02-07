@@ -49,9 +49,9 @@ int main(int argc, char* argv[])
 	if(strcmp(argv[1], "encode") == 0) {
 		cout << "\nencoding...\n\n";
 		out = encode(in);
-	} else if((argv[1], "decode") == 0) {
+	} else if(strcmp(argv[1], "decode") == 0) {
 		cout << "\ndecoding...\n\n";
-		decode(in);
+		out = decode(in);
 	} else {
 		printUsage();
 	}
@@ -110,9 +110,32 @@ string encode(string in)
 			out.push_back(base64[((ch1 << 2) & 0x3c)]);
 			out.append(1, '=');
 	}
+
 	return out;
 }
 
 // decode returns a decoded base64 string.
 string decode(string in) {
+	string out;
+	// Round length down to a multiple of 4.
+	int len = in.length();
+	len -= (len % 4);
+	// The set of character currently being decoded
+	int ch0, ch1, ch2, ch3;
+
+	// Use bitwise operators and the base64[] table to encode src.
+	// A      B      C      D
+	// 000000 111111 222222 333333
+	// 00000011 11112222 22333333
+	for(int i = 0; i < len; i+=4) {
+		ch0 = base64.find(in[i]);
+		ch1 = base64.find(in[i+1]);
+		ch2 = base64.find(in[i+2]);
+		ch3 = base64.find(in[i+3]);
+		out.push_back((ch0 << 2) | (ch1 >> 4));
+		out.push_back(((ch1 << 4) & 0xf0) | (ch2 >> 2));
+		out.push_back((ch2 << 6) | ch3);
+	}
+
+	return out;
 }
