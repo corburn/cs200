@@ -31,7 +31,7 @@ void printUsage();
 string encode( string in );
 string decode( string in );
 
-const char base64[65] = {"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"};
+static const string base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 int main(int argc, char* argv[])
 {
@@ -39,25 +39,25 @@ int main(int argc, char* argv[])
 		printUsage();
 	}
 
-	string input, output;
+	string in, out;
 
 	// Read in original string.
 	cout << "Enter text: ";
-	getline(cin, input);
+	getline(cin, in);
 
 	// Parse command line argument
 	if(strcmp(argv[1], "encode") == 0) {
 		cout << "\nencoding...\n\n";
-		output = encode(input);
+		out = encode(in);
 	} else if((argv[1], "decode") == 0) {
 		cout << "\ndecoding...\n\n";
-		decode(input);
+		decode(in);
 	} else {
 		printUsage();
 	}
 
 	// Print result
-	cout << output << endl;
+	cout << out << endl;
 
 	return 0;
 }
@@ -86,10 +86,10 @@ string encode(string in)
 		ch0 = in[i];
 		ch1 = in[i+1];
 		ch2 = in[i+2];
-		out.push_back(base64[((ch0 >> 2) & 63)]);
-		out.push_back(base64[((ch0 << 4) & 48) | ((ch1 >> 4) & 15)]);
-		out.push_back(base64[((ch1 << 2) & 60) | ((ch2 >> 6) & 3)]);
-		out.push_back(base64[ch2 & 63]);
+		out.push_back(base64[((ch0 >> 2) & 0x3f)]);
+		out.push_back(base64[((ch0 << 4) & 0x30) | ((ch1 >> 4) & 0x0f)]);
+		out.push_back(base64[((ch1 << 2) & 0x3f) | ((ch2 >> 6) & 0x03)]);
+		out.push_back(base64[ch2 & 0x3f]);
 	}
 
 	// Encode the remaining characters and pad with '='
@@ -98,16 +98,16 @@ string encode(string in)
 			break;
 		case 1:
 			ch0 = in[len];
-			out.push_back(base64[((ch0 >> 2) & 63)]);
-			out.push_back(base64[((ch0 << 4) & 48)]);
+			out.push_back(base64[((ch0 >> 2) & 0x3f)]);
+			out.push_back(base64[((ch0 << 4) & 0x30)]);
 			out.append(2, '=');
 			break;
 		case 2:
 			ch0 = in[len];
 			ch1 = in[len+1];
-			out.push_back(base64[((ch0 >> 2) & 63)]);
-			out.push_back(base64[((ch0 << 4) & 48) | ((ch1 >> 4) & 15)]);
-			out.push_back(base64[((ch1 << 2) & 60)]);
+			out.push_back(base64[((ch0 >> 2) & 0x3f)]);
+			out.push_back(base64[((ch0 << 4) & 0x30) | ((ch1 >> 4) & 0x0f)]);
+			out.push_back(base64[((ch1 << 2) & 0x3c)]);
 			out.append(1, '=');
 	}
 	return out;
