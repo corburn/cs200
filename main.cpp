@@ -75,7 +75,7 @@ string encode(string in)
 	// and use a switch statement to catch the edge cases.
 	int len = in.length();
 	len -= (len % 3);
-	// The set of character currently being encoded
+	// The set of characters currently being encoded
 	int ch0, ch1, ch2;
 
 	// Use bitwise operators and the base64[] table to encode src.
