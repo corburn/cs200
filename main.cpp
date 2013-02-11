@@ -92,7 +92,7 @@ string encode(string in)
 		out.push_back(base64[ch2 & 0x3f]);
 	}
 
-	// Encode the remaining characters and pad with '='
+	// Encode the edge-case characters and pad with '='
 	switch(in.length()%3) {
 		default:
 			break;
@@ -117,13 +117,19 @@ string encode(string in)
 // decode returns a decoded base64 string.
 string decode(string in) {
 	string out;
-	// Round length down to a multiple of 4.
 	int len = in.length();
-	len -= (len % 4);
+	
+	// Encoding to base64 always produces a string with a multiple of four length.
+	// Any other length indicates this is not a base64 string.
+	if((len % 4) != 0) {
+		cout << "Error: Malformed input" << endl;
+		exit(1);
+	}
+	
 	// The set of character currently being decoded
 	int ch0, ch1, ch2, ch3;
 
-	// Use bitwise operators and the base64[] table to encode src.
+	// Use the base64[] table and bitwise operators to encode src.
 	// A      B      C      D
 	// 000000 111111 222222 333333
 	// 00000011 11112222 22333333
