@@ -31,7 +31,7 @@ void printUsage();
 string encode( string in );
 string decode( string in );
 
-static const string base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+static const string base64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
 
 int main(int argc, char* argv[])
 {
@@ -126,8 +126,8 @@ string decode(string in) {
 		exit(1);
 	}
 	
-	// The set of character currently being decoded
-	int ch0, ch1, ch2, ch3;
+	// The set of characters currently being decoded
+	char ch0, ch1, ch2, ch3;
 
 	// Use the base64[] table and bitwise operators to encode src.
 	// A      B      C      D
@@ -138,6 +138,12 @@ string decode(string in) {
 		ch1 = base64.find(in[i+1]);
 		ch2 = base64.find(in[i+2]);
 		ch3 = base64.find(in[i+3]);
+
+		// If ch2 or ch3 are padding (64th character in base64[])
+		// set it to NUL. NUL is NUL even when shifted.
+		if(ch2 == 64) ch2 = 0;
+		if(ch3 == 64) ch3 = 0;
+
 		out.push_back((ch0 << 2) | (ch1 >> 4));
 		out.push_back(((ch1 << 4) & 0xf0) | (ch2 >> 2));
 		out.push_back((ch2 << 6) | ch3);
